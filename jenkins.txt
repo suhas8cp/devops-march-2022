@@ -11,16 +11,21 @@ Groovy
 Type of pipeline job in jenkins
 
 scripted pipeline 
-	- This is old way of pipeline code which scripted groovy syntax.
-	- All the groovy code will be written inside node block.
+	- Traditional way of writing groovy script 
+	- most of the options or configuration should be done manually.
+	- Most of the time we use inline block to write scripted pipeline.
+	- All the code is defined inside node block
 		
 		node { 
 		
 		}
 		
 declarative pipeline
-	- This is new way of pipeline code which simple groovy declarative.
-	- All the groovy code will be written inside pipeline block.
+	- New way of writing groovy declaratives 
+	- most of the options are predefined in declarative pipeline 
+	- we always write in a file called Jenkinsfile which is chechedin a SCM (git)
+	- all the code is defined inside pipeline block 
+	- The mandatory components of pipeline will be agent, stages, stage, steps
 	
 		pipeline {
 
@@ -29,13 +34,23 @@ declarative pipeline
 		
 		
 How to define a pipeline job in jenkins
-	1. we can put/write complete pipeline in script block of Job itself.
-	2. We can put the complete code in a file called "Jenkinsfile" and we source it from a SCM called git.
-		
+	1. We can add pipeline configuration in 2 ways 
+		a. We write all the configuration inside the pipeline job in job ui only.
+		b. We can write all the configuration in a file called Jenkinsfile and we can add that 
+		   from a SCM/Version control 
+	2. We are using only declarative pipeline type in our company.
+	
+Jenkinsfile	
+	- It is the file in which we write all our job configuration in groovy.
+	- In our company we are using declarative piepline in Jenkinsfile and we are maintaining 
+	  Jenkinsfile through git.	
 
 Agent
-	- An agent is a declarative used to define the execution method for all the pipeline stages.
-	- An agent can be declared at pipeline level and at stage level.
+	- An agent is a declarative used to defince the execution method for piepline stages.
+	- agent is the one which tell stages to execute on which node and its executro.
+	- Agent can be specified at two levels 
+				a. pipeline level 
+				b. Stage level
 		
 	Types of agent 
 		any 
