@@ -38,3 +38,9 @@ Agent
 		any 
 			- This is the default agent, If I wont specify any agent this will be considered.
 			- Runs the pipeline stages on any available node executor.
+			
+		none 
+			-  To define executor for each and every stage declare agent as none at pipeline level.
+			-  Using this we specify jenkins that agent is controlled at each stage level.
+			-  Devining agent at stage level is mandatory. 
+				
