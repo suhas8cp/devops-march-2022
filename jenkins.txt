@@ -1,7 +1,10 @@
 What are all the plugins in jenkins you have worked on ?
 How to run a job parallely 
 	- we can run free style job parallely by using "Execute concurrent builds" in general section 
-
+	
+	Pipeline 
+	- By default pipeline job runs concurrently.
+	- To run stages parallely we need to define the stages inside parallel block.
 
 Groovy 
 
@@ -47,3 +50,6 @@ Agent
 		label 
 			- we can define agent as label at pipeline to run all the stages of pipeline
 			  on a perticular node with label.
+			  
+		docker 
+			
