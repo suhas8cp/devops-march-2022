@@ -26,4 +26,15 @@ declarative pipeline
 		
 		
 How to define a pipeline job in jenkins
-			
+	1. we can put/write complete pipeline in script block of Job itself.
+	2. We can put the complete code in a file called "Jenkinsfile" and we source it from a SCM called git.
+		
+
+Agent
+	- An agent is a declarative used to define the execution method for all the pipeline stages.
+	- An agent can be declared at pipeline level and at stage level.
+		
+	Types of agent 
+		any 
+			- This is the default agent, If I wont specify any agent this will be considered.
+			- Runs the pipeline stages on any available node executor.
