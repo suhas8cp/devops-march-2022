@@ -1,0 +1,29 @@
+What are all the plugins in jenkins you have worked on ?
+How to run a job parallely 
+	- we can run free style job parallely by using "Execute concurrent builds" in general section 
+
+
+Groovy 
+
+Type of pipeline job in jenkins
+
+scripted pipeline 
+	- This is old way of pipeline code which scripted groovy syntax.
+	- All the groovy code will be written inside node block.
+		
+		node { 
+		
+		}
+		
+declarative pipeline
+	- This is new way of pipeline code which simple groovy declarative.
+	- All the groovy code will be written inside pipeline block.
+	
+		pipeline {
+
+
+		}	
+		
+		
+How to define a pipeline job in jenkins
+			
