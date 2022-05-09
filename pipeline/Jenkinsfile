@@ -5,13 +5,14 @@ pipeline {
 	stages {
 			
 			stage('Build') {
-				if (env.BRANCH_NAME == "release*" ) {
-					steps {
-						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
-							sh ''' 
-									exit 0
-							   '''
-						}	   
+				steps {
+					if (env.BRANCH_NAME == "release*" ) {
+						
+							catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
+								sh ''' 
+										exit 0
+								   '''
+							}	   
 					}
 				}
 			}
