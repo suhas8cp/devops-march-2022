@@ -1,17 +1,19 @@
+@Library('printuser')_
+
+getUser 'Harsha' 'Trainee'
+
 pipeline {
     
 	agent { label 'slave2' } 
 	
-	libraries {
-		lib('printuser@main')
-	}
+
 
 	stages {
 			
 			stage('Build') {
 					steps {
 						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
-							getUser 'Harsha' 'Trainee'
+							sh 'echo "STAGE 1 this is build stage"'
 						}	   
 					}
 			}
