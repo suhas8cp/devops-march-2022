@@ -1,0 +1,94 @@
+Maven is a project management tool which can manage complete build lifecycle.
+Maven simplifies and standardizes the project build process.
+
+Build process will be 
+	compile
+	testing 
+	library dependency 
+	distribution 
+	documentation 
+	deployment 
+	
+POM.xml 
+	- project object modal 
+	- In this file we put all the maven configurations.
+
+Maven folder structure 
+├── pom.xml
+└── src
+    └── main
+        ├── java
+        │   └── com
+        │       └── yourorganization
+        │           └── maven_sample
+        │               └── LogicPositivizer.java
+        └── resources
+            └── Blabla.java
+└── target	
+
+Maven build life cycle 
+A build lifecyle is a sequence of task used to build the application.
+	1. validate - validate thr project is correct and all the necessary information is 	  
+	              available. 		
+	2. compile - compiles the source code and create obeject code in target folder.
+	3. Test    - Test the compiled source code using unit testing (JUnit)
+	4. Package - All the compiled code is packages in to distribution format which is jar, war  
+	             and ear.	
+    5. integration-test - deplpy the package/build/artifact into an environment where 
+	                      integration-test can be executed  
+    6. verify  - verify the package is valid and it meets the configured criteria or not.
+	7. install - install/copy the package into the local repository.
+    8. deploy  - If configured, deploy the application/build to integration or relese environment.
+	
+Maven repository
+	Maven repository is a directory to store all the project jars, libraries, plugins and any artifacts related to project.	
+		1. Local Repository
+			- Is a local folder/directory on your machine (where we have installed or running 
+			  maven)
+			- The default location of maven local repository is HOME_DIRECTORY/.m2 directory
+			- .m2 is created when ever we run mvn command for the first time.
+			
+		2. Central Repository
+			- Maven central repository is managed by maven community and it contains large number 
+			  commonly used libraries.
+			- We can also publish our own libraries to central repository.
+		    - The default location is https://repo1.maven.org/maven2			
+			
+		3. Remote Repository
+			- A maven repository setup inside a company or a project related repository but not   
+			  public.
+			- This is a company maintained reposiroty which can be accessed only inside the 	  
+			  company network.
+	
+Maven dependency Search sequence 
+	1. Search in local repo.
+	2. Search in central repo.
+    3. Search in remote repo.
+
+	Maven stops searching once it finds the library.	
+	
+groupId
+	Is the unique project name or organization name 
+		- org (organization) 
+		- com (commercial) 
+			- company name 
+				- project/module
+artifactId
+	IS the name of the project / name of build 
+	
+versionId
+	Is the version number of the project 
+	
+properties 
+	- To set default encoding type 
+	- To set the maven version 
+
+Difference bertween mvn install vs mvn deploy 
+	install - it will upload the artifact to local repository (.m2 folder)
+	deploy - uploads the package/artifact to the another/remote repository 	
+		
+Assignment 
+	what is maven site ?
+	Check and run Archetype 
+	How to integrate maven with tomcat ?
+	
