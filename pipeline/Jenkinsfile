@@ -1,6 +1,10 @@
 pipeline {
     
 	agent { label 'slave2' } 
+	
+	libraries {
+		lib('printuser@main')
+	}
 
 	stages {
 			
@@ -11,7 +15,7 @@ pipeline {
 					steps {
 						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
 							sh ''' 
-									exit 0
+									getUser 'Harsha' 'Trainee'
 							   '''
 						}	   
 					}
