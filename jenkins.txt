@@ -87,6 +87,11 @@ Jenkins shared library set-up
 	STEP 3: Create a script with .groovy type (getUser.groovy).
 	STEP 4: configure jenkins to attach the above library.
 				Manage Jenkins -> Configure system -> Global Pipeline Libraries
-					Add ->  Name - give any name 
+					Add ->  Name - give any name (<library_name>)
 							Default Version - Branch in which vars is there
 							Retrieval method - Modern SCM 
+	STEP 5: In any pipeline job import the library using @Library directive 
+				@Library('<library_name>')_
+				
+				// Then call the script by its name (getUser.groovy)
+					getUser '<username>', '<designation>'
