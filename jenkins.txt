@@ -68,3 +68,4 @@ Agent
 			  
 		docker 
 			
+Build should not fail if a stage fails.			
