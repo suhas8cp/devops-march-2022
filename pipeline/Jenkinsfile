@@ -9,9 +9,6 @@ pipeline {
 	stages {
 			
 			stage('Build') {
-				when {
-					branch 'main'
-				}
 					steps {
 						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
 							sh ''' 
