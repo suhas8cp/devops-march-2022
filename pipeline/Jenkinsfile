@@ -5,7 +5,9 @@ pipeline {
 	stages {
 			
 			stage('Build') {
-			
+				when {
+					branch 'release*'
+				}
 				steps {
 					catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {	
 						sh ''' 
