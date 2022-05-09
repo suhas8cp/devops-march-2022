@@ -2,16 +2,16 @@ pipeline {
     
 	agent { label 'slave2' } 
     
-	environment {
-		TEST = "pipeline_level"
-	}
 	
+	parameters {
+	  string defaultValue: 'test', description: 'Which environment should the build need to deployed', name: 'TEST', trim: true
+	}
+
+
 	stages {
 			
 			stage('Build') {
-				environment {
-					TEST = "stage_level"
-				}
+			
 				steps {
 					sh ''' 
 							echo "STAGE 1: This is a build stage $TEST"
