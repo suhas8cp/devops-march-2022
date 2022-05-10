@@ -111,5 +111,5 @@ Docker container
 		
 		ex: docker run -it -d --name my_jenkins -p 8080:8080 -p 50000:50000 jenkins/jenkins
 		
-Assignment: work with docker commands
+Assignment: work with docker image and container commands
 			Try to create a jenkins container (jenkins/jenkins:lts)		
