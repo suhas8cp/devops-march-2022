@@ -87,6 +87,8 @@ Docker container
 				
 	To delete all stopped/exited containers 
 		docker rm $(docker ps -aq --filter status=exited)	
+					(or)
+		docker container prune
 		
 	To run a command inside a conatainer 
 		docker exec -it <container_id> <command>
@@ -98,8 +100,8 @@ Docker container
 		docker attach <container_ID>  
 				(safe exit <ctrl>+qp)
 					(OR)
-		docker exec -it <container_ID> /bin/bash	
-					
+		docker exec -it <container_ID> /bin/bash		
+	
 	To create a container from a docker image 
 		docker run -it -d --name <conainter_name> <image>:<tag> <run_time_command>
 		
@@ -147,7 +149,6 @@ Docker custom image / Dockerfile
 			RUN ['apt','update']	
 			RUN ['apt','install','-y','git']	
 			RUN ['ls','-lrt']	 
-		
 			
 	ENV 
 		- This instruction is used to set the environment variable inside the container.
@@ -182,7 +183,43 @@ Docker custom image / Dockerfile
 		COPY <source_path_from_build_context> <destination_inside_image>	  
 		ADD <source_path_from_build_context> <destination_inside_image>	  
 		
-	
+		
+	CMD and ENTRYPOINT
+		shell format 
+			CMD "ls -lrt"
+			ENTRYPOINT "ls -lrt"
+			
+		EXEC Format
+			CMD ["ls","-l","-rt"]
+			ENTRYPOINT ["ls","-lrt"]
+			
+		- Both CMD and ENTRYPOINT are used to define the execution command of the container which will be created 
+		  from this image.
+		- If we use multiple CMD or ENTRYPOINT in the same Dockerfile only the latest one will be considered 
+		  and all the other CMD or ENTRYPOINT will be ignored.	
+		- If we use both CMD and ENTRYPOINT in the same Dockerfile, ENTRYPOINT will get the 
+		  higest priority and the command of CMD will become as argumetns to ENTRYPOINT	
+		  
+		 Difference  
+		  -	CMD command can be overridden at the runtime.	
+		  - ENTRYPOINT can't be overridden at the runtime but the runtime command
+		    will become parameters to ENTRYPOINT command.
+		  
+		Note: Q. Can we override ENTRYPOINT 
+				 Yes, after docker 1.6 version docker has given option to over
+					  Entrypoint command at the runtime using --entrypoint 
+					  
+Docker Volumes
+ 	- As the layers inside the image are readonly which means once the image is created 
+	  we cannot change/edit so we cannot put the conatainer data in image.
+	- Container create a top most RW layer and all the runtime data is saved here. 
+	- Container layer is temparary layer, If we loose the container we loose data. so
+	  to retain/persist the container runtime data we need docker volumes.
+
+	Bind Mounts 
+		- we can mount host machine filesystem (files and directories) to the container
+		
+			docker run -v <host_path>:<container_path>
 	
 		
 	
