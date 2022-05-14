@@ -208,7 +208,14 @@ Docker custom image / Dockerfile
 		Note: Q. Can we override ENTRYPOINT 
 				 Yes, after docker 1.6 version docker has given option to over
 					  Entrypoint command at the runtime using --entrypoint 
-					  
+	
+	EXPOSE 
+		EXPOSE <port_number>
+		- Used to expose a port to the docker network 
+		- This is make the  port accessable by all the other containers in the 
+		  same docker network.	
+
+	
 Docker Volumes
  	- As the layers inside the image are readonly which means once the image is created 
 	  we cannot change/edit so we cannot put the conatainer data in image.
@@ -221,6 +228,70 @@ Docker Volumes
 		
 			docker run -v <host_path>:<container_path>
 	
+	Docker Volumes		
+		- These are docker managed filesystem and we use docker commands to manage these
+		  volumes 
+		- Volumes are easier to manage, backup or migrate than bind mounts.
+		- Volumes supports many drivers which means we can maunt many types of filesystem.
+		- Default location of docker volume is /var/lib/docker/volumes  	
 		
+		docker run -v <volume_name>:<container_path>
+		
+		To create volume 
+			docker volume create <volume_name>
+			
+		To list volume 
+			docker volume ls	
+			
+		To Delete volume 
+			docker volume rm <volume_name>
+			
+Namespaces and cgroups
+	- Docker uses linux namespaces to provide isolated workspace for processes called
+	  conatainer
+	- when a container is created, docker creates a set of namespaces for it and provides 
+	  a layer of isolation for container.
+	- Each container run in a different namespace 
 	
+
+	namespace (To list - lsns)
+		cgroups 
+			- Linux OS uses cgroups to manage the availale hardware resoruces such as 
+			  cpu, RAM, Disk, I/O.
+			- we can control tje access and also we can apply the limitations 
+
+			To list - lscgroup	
+		pid - namespace for managing processes (process isolation)
+		user - namespace for non-root user on linux.
+		uts - namespace for unix timesharing system which isolates kernel and version identifiers,
+			  time bonding of process.
+		ipc - (interprocess communication) namespace for managing the process communication.	  
+		mnt - namespace for managing filesystem mounts.
+		net - namespace for managing network interfaces.
+		
+Docker networking 
+	Publish 
+		PUBLISH = Expose + outside world port mapping 
+			
+	- publics will bind the container port to the host port which we can access from 
+	  outside world using <host_ip>:<port_mapped>
+	
+	- To publish a port 
+		docker run -p <host_port>:<container_port> .....
+		
+	-P publish_all
+		It binds all the exposed ports of the container to host machine port
+		
+	To map direct IP address to the host 
+		port to port 
+			ip:<host_port>:<container_port>
+			ip::<container_port>
+			
+	Range of ports 
+		many to one 
+			-p 8080-8090:8080
+		many to many 
+			-p 8080-8085:8086-8091
+			 - The total number of host ports in range should be same as the 
+			   total number of container ports range.
 				
