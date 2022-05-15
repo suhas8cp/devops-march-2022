@@ -168,7 +168,14 @@ Docker custom image / Dockerfile
 		The best way to load multiple env variable is using env file 
 			using --env-file <file_path> at the runtime (with docker run command) we can 
 			load the env file containing n number variables. 
-		
+	
+	ARG
+		Using ARG we can pass parameters to Dockerfile as user inputs 
+			
+		ARG <var_name>=<default_value>
+
+		To pass the value at build time 
+			docker build --build-arg <var_name>=<value> ....	
 		
 	COPY and ADD 
 		- Both copy and add instruction is used to copy files and directories from host machine to the image.
@@ -215,7 +222,12 @@ Docker custom image / Dockerfile
 		- This is make the  port accessable by all the other containers in the 
 		  same docker network.	
 
-	
+	WORKDIR
+		This is used to set the working directory for all the instructions that follows it
+		such as RUN, CMD, ENTRYPOINT, COPY, ADD
+		
+		WORKDIR <path>
+		
 Docker Volumes
  	- As the layers inside the image are readonly which means once the image is created 
 	  we cannot change/edit so we cannot put the conatainer data in image.
@@ -253,7 +265,6 @@ Namespaces and cgroups
 	  a layer of isolation for container.
 	- Each container run in a different namespace 
 	
-
 	namespace (To list - lsns)
 		cgroups 
 			- Linux OS uses cgroups to manage the availale hardware resoruces such as 
@@ -295,3 +306,132 @@ Docker networking
 			 - The total number of host ports in range should be same as the 
 			   total number of container ports range.
 				
+Docker network types 
+	1. Bridge 
+		- This is a private internal network created by docker on the host machine 
+		  by name docker0	
+		- This is the default network type for all the container which are created 
+          without any network configurations.
+		- By default all the containers in the same bridge can communicate with 
+		  eachother without any extra configuration.	
+		- We cannot use container name for communication only IP address is allowed in 
+		  default bridge.
+
+		Custom bridge 
+			To create bridge network 
+				docker network create --driver bridge my_bride 
+			
+			- In custom bridge containers can communicate with eachother with container 
+			  name and also with IP address.
+			
+	2. Host 		  
+		- This driver removes the network isolation between docker and the host.
+		- The containers are directly connected to host machine network without  
+		  extra layer of any docker network.
+		- Shares the same TCP.IP stack and same namespace of host machine.  
+		- All the network interfaces which are there in host machine are 
+		  accessable by this container.
+
+	3. None 
+		- Containers are not attached to any network by docker.
+		- All the required network configurations need to be done 
+		  manually.
+		- The host or any other containers won't be able to communicate 
+		  with this container untill a custom network is configured.
+		  
+ocker Architecture 
+	Docker Daemon 
+		- A background process that manages docker images, containers, network and volumes.
+		- This Daemon constantly listens for docker API request and processes them.
+	
+	Docker REST API 
+		- API which is used by applictions to interact with the docker daemon. 
+		
+	Docker CLI 
+		- It is a command line interface for interacting with docker daemon through
+		  REST api.
+	
+	Docker Objects 
+
+Benifits of Docker 
+	Flexible: 
+		Complex applictions cab be divided and containerised in small compenets called 
+		microservice. 
+	
+	Lightweight: 
+		Containers share the machine’s OS system kernel and therefore do not require 
+		an OS per application, driving higher server efficiencies and reducing server and licensing costs
+
+	portable: 
+		we can build images anywhere and then deploy to cloud, run anywhere.	
+
+States of conatiner / Lifecycle of container 
+	1. Created - if container is newly created and container is not yet started.
+	2. Running - A currently running container. It means there is no problem 
+				 with container to run the process.
+	3. Exited - A container ran and completed ot executiom with failure.
+	4. paused - A container whose process have been paused. (we can unpause the container)
+	5. Dead - if docker daemon tried and failed to stop a container (host ram full)
+	6. Restarting - container will be in the phase of retarting the main process.
+
+Multistage build 
+	How to optimize docker build process ?
+	How to reduce the size of the docker image or cotainer ? 
+
+	After docker 1.6 version docker released this option.
+	1. There are 2 problems with the normal build process 
+			1. Size: challenge is to keep the image and its containers size as minimal as possible.
+			2. larger the surface area more the application is vurnalable to attacks. 
+	
+		- Multistage build allows us to define multiple FROM in same Dockerfile.
+		- Dependency between multile FROM is maintained by naming FROM using 
+		  AS keyword and we can refer this name in another FROM.
+
+				FROM <base_image> AS <STAGE_NAME>
+				
+		- Only the final FROM image is created leaving back all the other FROM.
+		- Copy only the required files from the named FROM stage like below.
+				FROM final_build
+				COPY --from <STAGE_NAME> <src_named_stage> <dest>
+	
+	2. Always try to use the slim / alpine / stretch version of base image instead 
+	   od using the fully loaded base image.
+	   
+	exapmle: https://github.com/jaintpharsha/docker_multi_build.git		  
+	
+docker-compose 
+	Installation 
+		1. sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+		2. sudo chmod +x /usr/local/bin/docker-compose
+		3. sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+		
+	- docker-compose is a tool for defining and running multile container docker application with 
+	  a single command.
+	- We use YAML file to do docker related configurations then with a single command 
+	  we can execute this YAML file to create docker objects defined in this file.	
+	  
+	docker-compose.yml 
+		version: "3.8"
+		services:
+			jenkins:
+				image: jenkins/jenkins:lts
+				container_name: dc-jenkins
+				ports:
+					- "8080:8080"
+					- "5000:5000"
+				networks:
+					- my_brid
+			alpine:
+				build: .
+				container_name: dc-ubuntu
+				volumes:
+					- my_vol:/home
+				networks:
+					- my_brid
+		networks:
+			my_brid:
+				driver: bridge
+
+		volumes:
+			my_vol: {} 
+	
