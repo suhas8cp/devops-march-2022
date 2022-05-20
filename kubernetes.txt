@@ -123,4 +123,66 @@ kubernetes Architecture
 			- pods are the smallest deployable object in kuberntes.
 			- pod should contain atleast one container and can have n number of containers.
 			- If pod contains more than one container all the container share the same memory assigned to that pod.
+
+YAML file 
+	- filetype .yaml or .yml 
+	- YAML file contains key - value pairs where key are fixed and defined by the 
+	  kubernetes and value is user defined configuration.
+	- Values supoorts multiple datatypes - string, Integer, Boolean, Array, List.	
+	
+	example: List representation  
+	
+			1) name: Harsha
+			   hobbies: ["Driving","coding"]
 					
+						(or)
+				
+			   name: Harsha
+			   hobbies: 
+				   - Driving
+				   - coding
+
+example pod 	
+	
+	apiVersion: v1
+		- This is the version of api used to create a k8s object.
+		- The fields are casesensitive and YAML use camelcase.
+		- The type of api are alpha, beta and stable.
+		
+	kind: Pod
+		- here we specify which object we need to create. 
+		- Always object name first letter is capital.
+		
+	metadata:
+	    - This field is used to provide information on the object 
+		  which we are creating.
+		- Information such as name, labels and annotaions. 	
+	
+	spec:
+		- This is used to do the actual configuration of the 
+		  object.
+		  
+apiVersion: v1
+kind: Pod 
+metadata: 
+    name: my-first-pod	
+spec: 
+    containers:
+       - name: my-nginx 
+         image: nginx:latest
+		 ports: 
+		    - containerPort: 80
+	
+TO create / apply a configuration 
+	kubectl apply -f <file>.yml	
+	
+To list objects 
+	kubectl get <obeject_type>
+		ex: List pods - kubectl get pods 
+		    List deployment - kubectl get deployments
+			
+To delete objects 
+	kubectl delete <object_type>
+
+
+Assignment: What happens if we create a pod with kubectl ?		  
