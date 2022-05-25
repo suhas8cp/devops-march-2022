@@ -399,4 +399,87 @@ Service (svc)
 			  nodePort:30082	
 			  port: 8080
 			  targetPort: 80
-					 
+			  
+3. Load Balancer
+	- It is a tyoe of service which is used to link exernatl load balancer to the cluster.
+	- This type of serviec is used by cloud providers and this service is completely depends on cloud providers. 
+	- K8s now proides a better alternative for this service type which is called Ingress.
+
+Assignment: 
+	
+How to use custom images / connect to a registry through k8s 
+	1. Login to the docker hub account 
+		  docker login 
+	2. Create a app to print ip 
+			using flask 
+	3. 	push the image to your registry 
+	4 use the above custom image in k8s spec file.
+	
+		image: <username>/<regirty_name>:<tag>
+		imagePullPolicy: IfNotPresent
+		
+	5. Create a service of type NodePort attaching the above pods 
+		
+namespaces 
+	- k8s namespaces is a way of applying abstraction / isolation to support multiple 
+	  virtual clusters of k8s objects with in the same physical cluster.
+	- Each and every object in k8s must be in a namespac.
+	- If we wont specify namespace, objects will be created in default namespace of k8s.
+    - namespaces are cluster level.
+	- by default pods in same namespace can communicate with eachother.
+	- Namespace are only hidden from eachother but not fully isolated because one 
+	  service in a namespace can talk to another service in another namespace using 
+	  fullname (service/<service_name>) followed by namespace name
+	
+	usage: we can apply environment based logical separation on cluster. 
+		
+	Type of deafault NS
+	1. default
+	   - This NS is used for all the objects which are not belongs to any other namespace.
+	   - If we wont specify any namespace while creating an object in k8s then 
+         that object will be created in deafult namespace.
+			
+	2. kube-system 
+	   - This namespace is always used for objects created by the k8s system.
+	   
+	3. kube-public 
+	   - The objects in this namespace are available or accessable to all.
+       - All the objects in this namespace are made public.
+
+	4. kube-node-lease 
+	   - This namespace holds lease objects assosiated with each node.
+	   - Node lease allows the kubelet to send heartbeats so that the control palne can 
+		 detect node failure.
+	
+	To list namespace
+		kubectl get namespaces 
+	
+	To list objects in a namespace 
+		kubectl get pods --namepsace <NS_name> 
+					(OR)
+		kubectl get pods -n <NS_name> 
+	
+	To list obects from all namespaces
+		kubectl get pods --all-namespaces
+		
+	To create a namespace 
+		kubectl create namespace <ns_name>
+		
+	To create k8s object in a namespace 
+		1. in the spec file 
+			metadata: 
+				namespace: <ns_name>
+				
+		2. Using the apply command 
+			kubectl apply -n <ns_name> -f <spec>.yml
+		
+		Note: what if we use both inside specfile and also in apply command 
+				- apply command check and compares the namespace and wont allow to create the obejct if the namespace is different.
+
+Assignment: try exec to a pod 				
+	
+	- pod to pod communication is open if the 2 pods are in the same namespace.	
+	- If the pods are in different namespace by default they can't communicate we need a service object for this.
+	
+	How a microservice will communicate with other microservice
+	What is service discovery in k8s 
