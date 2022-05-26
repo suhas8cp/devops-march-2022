@@ -481,5 +481,74 @@ Assignment: try exec to a pod
 	- pod to pod communication is open if the 2 pods are in the same namespace.	
 	- If the pods are in different namespace by default they can't communicate we need a service object for this.
 	
-	How a microservice will communicate with other microservice
-	What is service discovery in k8s 
+
+How a microservice will communicate with other microservice
+What is service discovery in k8s 
+	
+Service discovery 
+	There are 2 ways of dicovering a service in k8s 
+	
+		1. Services 
+			 we can use the full name of service to discovery a microservice (pod).
+			 	service/<service_name>
+				
+		2. DNS 
+			- DNS server is added to the cluster in order to watch the k8s service request.
+			- API server will create DNS records for each new service.
+			- Record A type is used in k8s service discovery and this DNS is created on service
+			  and pod objects.
+			
+			syntax of k8s DNS 
+				<object_name>.<namepsace_name>.<object_type>.<k8s_domian>
+				
+				ex: np-ip-app.default.svc.cluster.local
+		
+		3. ENV variables 
+			- which ever the pod that runs on a node, k8s adds environment variables for 
+			  each of them to identify the service running in it.
+			  
+		https://dev.to/narasimha1997/communication-between-microservices-in-a-kubernetes-cluster-1n41	
+		
+Headless service 
+	headless service 
+		  - When we neither need nor want loadbalancig and a single IP point to a service, we need use headless service.
+		  - Headless service returns all the ips of the pods it is selecting.
+		  - headless serivce is created by specifing none for clusterIP 
+		  - headless service is usually used with statefulsets.
+		  
+	headless with in cluster 
+
+		apiVersion: v1 
+		kind: Service 
+		metadata:
+			 name: my-svc 
+		spec: 
+			clusterIP: None
+			selector: 
+				app: my-nginx 
+			ports: 
+				- name: http
+				  port: 30080
+				  targetPort: 8080
+				  
+	headless with nodeport 			  
+		nodePort = headless + port mapping 
+		
+		apiVersion: v1 
+		kind: Service 
+		metadata:
+			 name: my-svc 
+		spec: 
+			clusterIP: None
+			type: NodePort
+			selector: 
+				app: my-nginx 
+			ports: 
+				- name: http
+				  nodePort:30082	
+				  port: 8080
+				  targetPort: 80
+				  
+	1. Create a headless service with statefulsets
+	2. Login to any one of pod 
+	3. apt install dnsutils and do nslookup <service_name>	
