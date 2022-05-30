@@ -765,3 +765,130 @@ sidecat container
 		  tool.
 	
 	https://www.magalix.com/blog/kubernetes-patterns-the-ambassador-pattern
+	
+Probes
+- probe is a periodic call to some applciation endpoints within a container.
+	- probes can track success or failure of the other applications.
+	- When there is a subsequent failure occures we can defie probe to get triggered.
+	- when subsequent success after a failure we can define probe to get triggered.
+	- probes works at container level.
+	
+	Common fields in probes 
+		initialDelaySeconds
+			- After the container has started the number of seconds to wait before the probe os triggered.
+		periodSeconds 
+			- The number of seconds interval the probe should be executed. (Default 10 seconds and minimum 1 second)
+		timeoutSeconds 
+			- Number of seconds after which probe timeouts. (default 1)
+			
+		failureThreshold
+			- When a probe fails this is the number of subsequent fail times the probe checks the status of application.
+			- After the number of subsequent failure then probe fails.
+			- Default value 3 with minimum value 1
+		
+		successThreshold 
+			- minimum number of subsequent success for a probe. 
+			- Default value is 1
+			
+		Endpoints 
+			http probes (httpGet)
+				host - hostname to conenct and probe will check the status of this hostname 
+				     - Default is the IP of current pod 
+					 ex: www.google.com
+				path - exact path to access the application on the http server 
+					 ex: /gmail
+				httpHeaders
+					- can send custom header messages with the request.
+				port 
+					- Name or number of the port to access the application 
+					
+			TCP probes 
+				port 
+					- Name or number of the port to access the application
+			
+			exec 
+				commad 
+				  - we execute a command and check its status.
+		
+Liveness probe 
+		- The livenessprobe is used to determine if the applciation inside the container 
+		  is healthy or needs to be restarted.	
+		- If livenessprobe fails it will mark the container to be retarted by kubelet.
+		
+	1. LivenessPRobe with http 
+		
+		apiVersion: v1
+		kind: Pod 
+		metadata: 
+			name: liveness-http	
+		spec: 
+			containers:
+			   - name: liveness 
+				 image: k8s.gcr.io/liveness
+				 args:
+					- /server
+				 livenessProbe:
+				    httpGet:
+				  	   path: /healthz
+				  	   port: 8080
+				    initialDelaySeconds: 3
+				    periodSeconds: 3	
+		
+	2. TCP 
+		livenessProbe:
+			tcpSocket:
+			   port: 8080
+			initialDelaySeconds: 3
+			periodSeconds: 3
+	3. exec 
+		livenessProbe:
+			exec:
+			   command: ["",""]
+			initialDelaySeconds: 3
+			periodSeconds: 3
+	
+	4. named port 
+		ports: 
+			- name: liveness-port 
+			  containerPort: 8080
+              hostPort: 8080
+		livenessProbe:
+			httpGet:
+			   path: /healthz
+			   port: liveness-port
+			initialDelaySeconds: 3
+			periodSeconds: 3			
+	
+Readiness Probe 
+	- ReadinessProbe is used to determine that a application running inside a 
+	  container is in a state to accept the traffic.
+    - When this probe is successful, the traffic from the loadbalancer is allowed 
+	  to the application inside the conatiner.
+	- When this probe is fails, the traffic from the loadbalancer is halted
+	  to the application inside the conatiner.
+	readinessProbe: 
+		tcpSocket: 
+			port: 8080
+		initialDelaySeconds: 15
+		periodSeconds: 10
+		
+Startup Probe 
+	- This probe will run at the initial start of the container.
+	- This probe allows us to give maximum startup time for application before 
+	  running livenessProbe or readinessprobe.
+	  
+	startupProbe: 
+	    httpGet: 
+		   path: /healtz
+		   port: 8080
+		initialDelaySeconds: 3
+	    periodSeconds: 3   
+
+Assigment: create livenessProbe and readinessprobe with tcp, http, exec 	
+	
+		
+		
+			
+			
+		
+	
