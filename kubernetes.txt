@@ -499,7 +499,7 @@ Service discovery
 			  and pod objects.
 			
 			syntax of k8s DNS 
-				<object_name>.<namepsace_name>.<object_type>.<k8s_domian>
+				<object_name>.<namepsace_name>.<object_type>.cluster.local
 				
 				ex: np-ip-app.default.svc.cluster.local
 		
@@ -885,10 +885,140 @@ Startup Probe
 	    periodSeconds: 3   
 
 Assigment: create livenessProbe and readinessprobe with tcp, http, exec 	
-	
-		
-		
+
+
+Configmaps and Secrets 
+	- Configmaps are k8s object that allow us to seperate the configuration data from 
+	  the image content of the pod.
+	- using this we can inject the environment variables to the pod containers.
+    - By deafault data is not encrypted in configmaps so it is better to use these for 
+	  non-confidential data.
+
+	Create a configmap
+		1. Create a file by name "app.properties"
+			environment=test
+			database_url="192.168.1.1"
+			database_password="adjhfgjladhgalhg"
 			
+		2. Load the single config file 
+			kubectl create configmap <configmap_name> --from-file configs/app.properties
+
+		   Load the multiple config files 	
+			kubectl create configmap <configmap_name> --from-file configs/
 			
+		   Create configmap spec file 
+				apiVersion: v1
+				kind: ConfigMap
+				metadata:
+				   name: test-configmap
+				data:
+				   environment: test
+				   app: frontend
+			
+		3. To use configmaps to inject env varible in a pod
+			
+				apiVersion: v1
+				kind: Pod
+				metadata:
+				  name: nginx-deployment-new
+				spec:
+				    containers:
+					  - name: nginx
+						image: nginx:1.14.2
+						ports:
+						- containerPort: 80
+						env:
+						  - name: CURRENT_ENV
+						    valueFrom: 
+                                configMapKeyRef: 							
+									name: test-configmap
+									key: environment
+						  - name: DB_URL
+						    valueFrom: 
+                                configMapKeyRef: 							
+									name: test-configmap
+									key: database_url			
 		
+	SECRETS	
 	
+	- using secrets we can inject the environment variables to the pod containers in encrypted.
+    - By deafault secrets data will be in base64 format and we use secrets for confidential data.
+		
+
+	Create a configmap
+		1. Create values in base64 format 
+			echo "<value>" | base64 
+				output: <base64_value>
+			echo "<value1>" | base64 
+				output: <base64_value1>
+		
+		2. Load the single config file 
+			kubectl create secret <configmap_name> --from-file configs/app.properties
+
+		   Load the multiple config files 	
+			kubectl create secret <configmap_name> --from-file configs/
+			
+		   Create configmap spec file 
+				apiVersion: v1
+				kind: Secret
+				metadata:
+				   name: test-secret
+				data:
+				   dburl: <base64_value>
+				   dbpassword: <base64_value1>
+			
+		3. To use secrets to inject env varible in a pod
+				apiVersion: v1
+				kind: Pod
+				metadata:
+				  name: nginx-deployment-new
+				spec:
+				    containers:
+					  - name: nginx
+						image: nginx:1.14.2
+						ports:
+						- containerPort: 80
+						env:
+						  - name: DB_URL
+						    valueFrom: 
+                                secretKeyRef: 							
+									name: test-secret
+									key: dburl
+						  - name: DB_PASSWORD
+						    valueFrom: 
+                                secretKeyRef: 							
+									name: test-secret
+									key: dbpassword		
+		
+How to create a pod on a particular worker pod 
+	1. Node selector 
+		- Node selector is a way of binding pod to a worker node or nodes based on the 
+		  node labels.
+		- We cannot use any logical expresions type of selection.  
+	
+		create a label to worker node 
+			kubectl label node <node_name> <key>=<value>
+			
+		Use nodeSelector with the same label created to create pods in the same worker node
+			apiVersion: apps/v1
+			kind: Deployment
+			metadata:
+			  name: nginx-deployment
+			spec:
+			  replicas: 6
+			  selector:
+				matchLabels:
+				  app: ipapp
+			  template:
+				metadata:
+				  labels:
+					app: ipapp
+				spec:
+				  nodeSelector:
+					<key>: <value>
+				  containers:
+				  - name: nginx
+					image: nginx:latest
+					ports:
+					- containerPort: 80
+				
