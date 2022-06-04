@@ -1021,4 +1021,129 @@ How to create a pod on a particular worker pod
 					image: nginx:latest
 					ports:
 					- containerPort: 80
+
+service-controller
+endpoint-controller
+node-controller
+namespace-controller
 				
+Role-Based access control 
+	- accounts 
+	- Roles 
+	- Binding of roles 
+	
+	Accounts 
+		1. USER ACCOUNT 
+			it is used for human users to control the access to k8s.
+		
+		2. SERVICE ACCOUNT 
+			- It is used by the applications which need the access to the cluster.
+			- Any application running inside or outside the cluster need a service account.
+			
+			- We use a bearer token to authenticate the Service account. Beares token 
+			  is created and attached to SA using secrets.
+		
+		To create a service account 
+			kubectl create sa <account_name>
+			
+			Create a token for sa 
+				apiVersion: v1
+				kind: Secret
+				metadata:
+				  name: test-sa-token
+				  annotations:
+					kubernetes.io/service-account.name: <account_name>
+				type: kubernetes.io/service-account-token
+		
+		use this account in an application 
+			
+			apiVersion: v1
+			kind: Pod
+			metadata:
+			  name: nginx-deployment-new
+			spec:
+				serviceAccountName: test
+			    containers:
+				  - name: nginx
+					image: nginx:1.14.2
+					ports:
+					- containerPort: 80
+			
+Roles 
+	- For a account we can define set of rules to control the access to k8s resource.
+	- Roles are always userdifined which need to be attached to a account.
+	- Roles works for only namepsace. Roles are always defined for a namepsace.
+
+	common fields in roles 
+		apiGroups: List of apis to control the access
+		Subject: User account, serviceaccount or Groups.
+		Resources: K8S objects on which we want to define this roles
+				   ex: pods, deployments etc...
+		Verbs: The operations/actions that can be performed.
+				ex: ["get","list","create","delete","update","watch","patch","proxy"]
+			
+	Create a Role 
+		apiVersion: rbac.authorization.k8s.io/v1
+		kind: Role
+		metadata:
+		  namepsace: default	
+		  name: test-role
+		rules:
+			- apiGroups: [""]
+			  resources: ["pods"]
+			  verbs: ["get", "watch", "list"]	
+
+ClusterRole 
+	- this is cluster wide role 
+	
+	Create a ClusterRole 
+		apiVersion: rbac.authorization.k8s.io/v1
+		kind: ClusterRole
+		metadata:
+		  name: test-cluster-role
+		rules:
+			- apiGroups: [""]
+			  resources: ["pods"]
+			  verbs: ["get", "watch", "list"]
+	
+			  	
+Rolebinding and ClusterRoleBiniding 
+	- This helps to attach a role to a subject (useraccount, serviceaccount or groups)
+	- The only differenece is that we use rolebinding to attach role to account and 
+	  clusterrolebinding to attach cluster role to account.
+	
+	- We use RoleBinding to bind a Role to a ClusterRole  
+	
+	RoleBinding	
+		apiVersion: rbac.authorization.k8s.io/v1
+		kind: RoleBinding
+		metadata:
+		  namespace: default
+		  name: read-pods
+		subjects:
+		- kind: ServiceAccount
+		  name: test
+		  namespace: default
+		roleRef:
+		  apiGroup: rbac.authorization.k8s.io
+		  kind: Role
+		  name: test-role 
+		  
+	ClusterRoleBiniding	  
+		apiVersion: rbac.authorization.k8s.io/v1
+		kind: ClusterRoleBinding
+		metadata:
+		  namespace: default
+		  name: read-pods
+		subjects:
+		- kind: ServiceAccount
+		  name: test
+		  namespace: default
+		roleRef:
+		  apiGroup: rbac.authorization.k8s.io
+		  kind: ClusterRole
+		  name: test-role  
+		  
+	To check the access 
+		kubectl auth can-i list pods --as=system:serviceaccount:<account_namesapce>:<account_name> 
+		
