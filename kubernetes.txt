@@ -1238,3 +1238,36 @@ How to create a pod on a particular worker pod
 					image: nginx:latest
 					ports:
 					- containerPort: 80
+
+Resource quotas and limits 
+	How to limit the number of pods to a namepsace ?
+	how to limit the memory to a pod ?
+	
+	Count quota 
+		- This quota is used to limit the max number of obejcts that we can have 
+		  in a namepsace.
+		syntax: 
+			count/<resource>.<group> for resources from non-core groups
+			count/<resource> for resources from the core group
+			
+		Below are the list of resources we can have count quota 
+			count/pods
+			count/persistentvolumeclaims
+			count/services
+			count/secrets
+			count/configmaps
+			count/replicationcontrollers
+			count/deployments.apps
+			count/replicasets.apps
+			count/statefulsets.apps
+			count/jobs.batch
+			count/cronjobs.batch
+			
+		ex: 
+			apiVersion: v1
+			kind: ResourceQuota
+			metadata:
+			   name: pod-count-quota
+			spec:
+			  hard:
+				 scount/pods: "2"
