@@ -1271,3 +1271,240 @@ Resource quotas and limits
 			spec:
 			  hard:
 				 scount/pods: "2"
+				 
+	Quota on CPU/RAM/Disk
+		apiVersion: v1
+		kind: ResourceQuota
+		metadata:
+		   name: resource-quota
+		spec:
+		  hard:
+			 request.cpu: "0.2"
+			 limits.cpu: "0.8"
+			 
+					0r 
+					
+			 request.memory: "512Mi"
+			 limits.memory: "800Mi"	
+		
+		CPU 
+		  - 1 cpu, in k8s 1 is equal to 100% to 1 cpu/core and 1 hyperthread.
+		  - if not specified by deafult k8s allocates 0.5 cpu to a pod.
+	
+				we can have 0.1, 0.2, ..... 0.9, 1  
+				
+				0.1 cpu = 100m = 1 hundred milli cpu
+		
+		Memory 
+			- In k8s resources are measured in bytes. 
+			- The memory should in simple integer value (Fixed point number).
+			- Representation Ki,Mi,Gi,Ti,Pi,Ei
+					
+			apiVersion: v1
+			kind: Pod
+			metadata:
+			  name: nginx-deployment-new
+			spec:
+			    containers:
+				  - name: nginx
+					image: nginx:1.14.2
+					ports:
+					- containerPort: 80	
+				resources:
+					requests: 
+						memory: "100Mi"
+						cpu: 0.5
+					limits:
+						memory: "250Mi"
+						cpu: 1
+
+- The main function of a job is to create one or more pods and tracks the success 
+	  status of pods.
+	- Jobs ensure that the specified number of pods is completed successfully and 
+	  when the job is completed pods go to the shutdown state and Job goes to completed state. 
+    - Mainly we use jobs to run pod temporarily till the task is completed and to run 
+	  tasks parallely.	
+	  
+	  apiVersion: batch/v1
+	  kind: Job
+	  metadata:
+	    name: my-job
+	  spec:
+	    template:
+	  	spec:
+	  	  containers:
+	  	  - name: busybox
+	  		image: busybox
+	  		command: ["echo", "This is first job"]
+	  	  restartPolicy: Never
+
+	restartPolicy 
+		- This is applied to pod not for the Job.
+		- There are values,
+			1. Always 
+			   - This is the default restart policy containers will always be restarted if they stop, 
+			     even if they completed successfully. 
+			   - This policy should be used for applications that always needs to be running.
+			2. OnFailure
+			   	  - will always restart containers only if the container process exits with an error code.
+				  - If the container is determined to be unhealthy by a liveness probe it will be restarted.
+				  - we use this policy for applications that need to run successfully & then stop.
+			3. Never
+				  - The pod’s containers will never be restarted, even if the container exits with error code 
+				    or a liveness probe fails. 
+	The different type of jobs or common parameters are,
+	
+	Completions
+		- This is the number of times the job to run. default is 1.
+		- If, completions is 5 then job will run 5 times means 5 pods.
+	  apiVersion: batch/v1
+	  kind: Job
+	  metadata:
+	    name: my-job
+	  spec:
+	  completions: 5
+	    template:
+	  	spec:
+	  	  containers:
+	  	  - name: busybox
+	  		image: busybox
+	  		command: ["echo", "This is first job"]
+	  	  restartPolicy: Never	
+
+	parallelism
+		- By default jobs run serialy so to run jobs parallely we need to use the parallelism.
+		- parallelism is used to set the number of job that need to run prallely.
+		
+	  apiVersion: batch/v1
+	  kind: Job
+	  metadata:
+	    name: my-job
+	  spec:
+	  completions: 5
+	  parallelism: 2
+	    template:
+	  	spec:
+	  	  containers:
+	  	  - name: busybox
+	  		image: busybox
+	  		command: ["echo", "This is first job"]
+	  	  restartPolicy: Never
+
+	backoffLimit
+		- If the container is failing for some reason which affects the completion the job,
+		  then still job creates more pods one after another until it succeeds which will 
+		  simply put a load on the cluster, in this case backoffLimit is used.
+		-  backoffLimitlimit ensure the number pods to limit after failure.
+		- backoffLimit: 2, once pods fails for 2 times it won’t create more pods.
+	  
+	  apiVersion: batch/v1
+	  kind: Job
+	  metadata:
+	    name: my-job
+	  spec:
+	  backoffLimit: 2
+	    template:
+	  	spec:
+	  	  containers:
+	  	  - name: busybox
+	  		image: busybox
+	  		command: ["sleep", "60"]
+	  	  restartPolicy: Never	
+
+	activeDeadlineSecond
+		- This is used to set the execution time for pod and if pod takes more than this 
+		  deadline time then pods will be terminated automatically.
+
+	  apiVersion: batch/v1
+	  kind: Job
+	  metadata:
+	    name: my-job
+	  spec:
+	  activeDeadlineSecond: 20
+	    template:
+	  	spec:
+	  	  containers:
+	  	  - name: busybox
+	  		image: busybox
+	  		command: ["sleep", "60"]
+	  	  restartPolicy: Never
+		  
+	Scheduled / CronJob
+		apiVersion: batch/v1
+		kind: CronJob
+		metadata:
+		  name: hello
+		spec:
+		  schedule: "* * * * *"
+		  jobTemplate:
+			spec:
+			  template:
+				spec:
+				  containers:
+				  - name: hello
+					image: busybox:1.28
+					imagePullPolicy: IfNotPresent
+					command:
+					- /bin/sh
+					- -c
+					- date; echo Hello from the Kubernetes cluster
+				  restartPolicy: OnFailure
+		
+		1. SuccessfulJobHistoryLimit and FailedJobHistoryLimit
+			apiVersion: batch/v1
+			kind: CronJob
+			metadata:
+			  name: hello
+			spec:
+			  schedule: "* * * * *"
+			  successfulJobHistoryLimit: 2
+			  failedJobHistoryLimit: 1
+			  jobTemplate:
+				spec:
+				  template:
+					spec:
+					  containers:
+					  - name: hello
+						image: busybox:1.28
+						imagePullPolicy: IfNotPresent
+						command:
+						- /bin/sh
+						- -c
+						- date; echo Hello from the Kubernetes cluster
+					  restartPolicy: OnFailure
+					  
+Deployment stratergies.	
+	Rolling Update 
+		- By default deployment in k8s uses rolling update stratergy which means if I want use 
+		  this stratergy I don'nt need to specify any parameters in spec file. 
+		- Example: By default k8s automatically decides the percentage of keeing available pods.
+		  usually one out 4 it updates. 
+		
+		- To overrride the default behaviour 
+			spec: 
+				stratergy: 
+					type: RollingUpdate 
+					rollingUpdate: 
+						maxSurge: 1
+						maxUnavailable: 25%
+			
+	Recreate 
+		The Recreate stratergy will bring all the old pods down immediately and the creates 
+		new updated pods to match the replica count.
+			spec: 
+				stratergy: 
+					type: Recreate 
+					
+	Blue/Green deployment
+		- We keep 2 sets of similar environment in which one will be live called blue  
+		  environment and the one which is not live is called as green. 
+		- we update the new changes to blue environment first which is not live and we 
+		  swap/ redirect the traffic from blue to green environment.
+		- Finally blue environment with new updates will become live and we rename it as 
+		  the current new blue environment.
+	
+	Canary release 
+		- A canary release is a software testing technique used to reduce the risk of 
+		  introducing a new software version into production by gradually rolling out 
+		  the change to a small subgroup of users, before rolling it out to the entire 
+		  platform/infrastructure.
