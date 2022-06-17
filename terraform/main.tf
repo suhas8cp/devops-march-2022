@@ -9,7 +9,6 @@ data "aws_ami" "my_ubuntu" {
     owners = ["self"]
 }
 
-
 resource "aws_instance" "my_instance1" {
     ami = var.my_ami
     instance_type = var.my_instance_type
