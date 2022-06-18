@@ -1,18 +1,10 @@
-data "aws_ami" "my_ubuntu" {
-    most_recent = true 
-
-    filter {
-        name = "name"
-        values = ["K8S Master"]
-    }
-
-    owners = ["self"]
+module "create_s3_backend" {
+    source = "./modules/create_s3"
+    bucket_name = var.root_bucket_name 
 }
 
-resource "aws_instance" "my_instance1" {
-    ami = var.my_ami
-    instance_type = var.my_instance_type
-    tags = {
-        Name = "terraform-instance1"
-    }
+module "create_dynamo_locking" {
+    source = "./modules/create_dynamodb"
+    hash_key = var.root_has_key
+    dynamodb_name = var.root_locking_table
 }

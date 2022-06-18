@@ -191,4 +191,43 @@ terraform variables and outputs
 			output "ec2_public_ip" {
 				value = aws_instance.new_ec2.public_ip 
 			}
+
+Modules
+	all the set of terraform configurations (all .tf files) in a folder is called as module 
+	
+	Root Module 
+		- The .tf files iin the working directories is root module 
+		- Where we run terraform init which contains terraform configurations is root module 
+		- Every terraform configuration has to have atleast one module by default it will be root module.
+		
+	Child module 
+		A terraform set of configurations defined in sub folder can be called by other modules (root module)
+		to extend the functionality. 
+		These are usually user defined modules.		
+		
+Assignment: create s3 with versioning enabled and sse of default type.
+				- no value should be hard coded in the resource block.
+				- should print output - s3 buckate name and some 4 details
+				
+Taint
+	- The terraform taint command is used to mark a terraform managed resoruce as tainted, which will 
+	  mark the resource to be destroyed and recreated in the new apply operation.
+	- Taint will not apply the tainted mark on the actual resoruce in the infrastructure but it will mark 
+	  as tainted in the state file.
+	- If we do terraform plan/apply it will show resources as tainted.
+
+	
+	To taint a resource
+		terraform taint <reasource_type>.<resource_name>
+		
+	To taint a module resource
+		terraform taint -module=<module_name> <reasource_type>.<resource_name>
+		
+		terraform taint <terra.arn>
+	
+	To list the resources 
+		terraform state list 
+		
+	To remove taint 
+		terraform untaint <reasource_type>.<resource_name>
 	
