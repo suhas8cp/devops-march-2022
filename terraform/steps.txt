@@ -1,0 +1,4 @@
+1. ec2_instance "provisioner" should be created
+2. copy the file install.sh to above ec2_instance "/home/ubuntu"
+3. we need to get a file config/ec2_ip.txt with above ec2_instance public_ip
+4. In the above ec2_instance docker should be installed. 
