@@ -1,35 +1,41 @@
-module "create_s3_backend" {
-    source = "./modules/create_s3"
-    bucket_name = var.root_bucket_name 
+# Terraform count
+
+resource "null_resource" "count_sample" {
+    count = 2
 }
 
-module "create_dynamo_locking" {
-    source = "./modules/create_dynamodb"
-    hash_key = var.root_has_key
-    dynamodb_name = var.root_locking_table
+output "count_out" {
+    value = null_resource.count_sample
 }
 
-module "create_ec2" {
-    source = "./modules/create_ec2"
-    my_ami = "ami-006d3995d3a6b963b"
-    my_instance_type = "t2.micro"
-    pem_key_name = "march-2022"
+locals {
+    names = ["bucket1","bukcet2","bukcet3","bukcet4","bukcet5"]
 }
 
-module "file_copy" {
-    source = "./modules/file"
-    ec2_username = "ubuntu"
-    instance_public_ip = module.create_ec2.instance_public_ip
+resource "null_resource" "count_list_resource" {
+    count = length(local.names)
+    triggers = {
+      "name" = local.names[count.index]
+    }
 }
 
-module "ec2_local_exec" {
-    source = "./modules/local_exec"
-    instance_public_ip = module.create_ec2.instance_public_ip
+output "count_list" {
+    value = null_resource.count_list_resource
 }
 
-module "ec2_remote_exec" {
-    source = "./modules/remote_exec"
-    ec2_username = "ubuntu"
-    instance_public_ip = module.create_ec2.instance_public_ip
+# Terraform for_each 
+
+locals {
+    names = ["bucket1","bukcet2","bukcet3","bukcet4","bukcet5"]
 }
 
+resource "null_resource" "count_list_resource" {
+    for_each = toset(local.names)
+    triggers = {
+      "name" = each.value
+    }
+}
+
+output "count_list" {
+    value = null_resource.count_list_resource
+}
